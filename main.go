@@ -29,11 +29,25 @@ func main() {
 		false,
 		false,
 	)
+
+	sConf := crypto.CreateConfig(
+		20000,
+		true,
+		true,
+		true,
+		true,
+		true,
+	)
 	i := 0
+	for i < 2 {
+		fmt.Println(crypto.GeneratePassword(sConf))
+		i++
+	}
 	for i < 2 {
 		fmt.Println(crypto.GeneratePassword(pConf))
 		i++
 	}
+
 }
 
 func responder(w http.ResponseWriter,r *http.Request) {
