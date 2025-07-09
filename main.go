@@ -1,68 +1,51 @@
 package main
 
 import (
+	"os"
 	"fmt"
+	"embed"
 	"net/http"
 	"io/ioutil"
+	"path/filepath"
+	"encoding/json"
 	crypto "pass_gen/utils"
 )
 
+var embedded embed.FS
+
 func main() {
 
-	/*
-	filesDir := "./public"
-	filesRoute := "/views/"
-
-	http.HandleFunc("/hash",responder)
-
-	fileServer := renderFrontend(filesDir,filesRoute)
-	http.Handle(filesRoute,fileServer)
-
-	fmt.Println("server on port 7000")
-	http.ListenAndServe(":7000",nil)
-	*/
-
-	pConf := crypto.CreateConfig(
-		10000000,
-		true,
-		true,
-		false,
-		false,
-	)
-
-	sConf := crypto.CreateConfig(
-		20000,
-		true,
-		true,
-		true,
-		true,
-	)
-	i := 0
-	for i < 2 {
-		fmt.Println(crypto.GeneratePassword(sConf))
-		i++
-	}
-	for i < 2 {
-		fmt.Println(crypto.GeneratePassword(pConf))
-		i++
-	}
 	
 	filesDir := "./public"
-	filesRoute := "/views/"
 
-	http.HandleFunc("/hash",responder)
+	// api for hashing
+	http.HandleFunc("/hash",hasher)
 
-	fileServer := renderFrontend(filesDir,filesRoute)
-	http.Handle(filesRoute,fileServer)
+	// api for password generation
+	http.HandleFunc("/generate-password",passwordGenerator)
+
+	// rendering frontend in all undefined server routes
+	fileServer := http.FileServer(http.Dir(filesDir))
+
+	http.HandleFunc("/",func(w http.ResponseWriter, r *http.Request) {
+		targetPath := filepath.Join(filesDir,r.URL.Path)
+		_,err := os.Stat(targetPath)
+
+		if os.IsNotExist(err) || r.URL.Path == "/" {
+			http.ServeFile(w,r,filepath.Join(filesDir,"index.html"))
+			return
+		}
+		fileServer.ServeHTTP(w,r)
+	})
 
 	fmt.Println("server on port 7000")
 	http.ListenAndServe(":7000",nil)
-
-
-
+	
 }
 
-func responder(w http.ResponseWriter,r *http.Request) {
+// hashing func
+
+func hasher(w http.ResponseWriter,r *http.Request) {
 	// checking the http method
 	if r.Method != "POST" {
 		http.Error(w,"wrong method",http.StatusBadRequest)
@@ -86,9 +69,52 @@ func responder(w http.ResponseWriter,r *http.Request) {
 
 }
 
-func renderFrontend(targetDir,route string) http.Handler {
-	fileServer := http.FileServer(http.Dir(targetDir))
-	return http.StripPrefix(route,fileServer)
+// password generation
+
+type Config struct {
+	Length int `json:"length"`
+	Lower bool `json:"lower"`
+	Upper bool `json:"upper"`
+	Numbers bool `json:"numbers"`
+	Symbols bool `json:"symbols"`
 }
 
+func passwordGenerator(w http.ResponseWriter,r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w,"wrong method",http.StatusBadRequest)
+		return 
+	}
 
+	var config Config
+	err := json.NewDecoder(r.Body).Decode(&config)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w,err.Error(),http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	pConfig := crypto.CreateConfig(
+		config.Length,
+		config.Lower,
+		config.Upper,
+		config.Numbers,
+		config.Symbols,
+	)
+
+	/*
+	fmt.Println(r.Body)
+	fmt.Println(config)
+	fmt.Println(pConfig)
+	*/
+
+	generatedPassword,err := crypto.GeneratePassword(pConfig)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w,err.Error(),http.StatusBadRequest)
+		return
+	}
+
+	fmt.Fprintf(w,generatedPassword)
+
+}

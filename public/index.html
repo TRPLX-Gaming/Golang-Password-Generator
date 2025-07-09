@@ -6,11 +6,57 @@
   <title>Password Generator by TRPLX</title>
 </head>
 <body>
-  <div class="center">
+  <h1 class="hash-title" style="text-align:center">
+    Simple String Hasher
+  </h1>
+  <div class="center" style="margin-bottom:100px">
     <input type="text" placeholder="input the string you wanna hash" class="input">
      <button class="hash-btn">Hash</button>
   </div>
- 
+  <div class="center">
+    <div class="hash-result"></div>
+  </div>
+  
+  <br>
+  
+  
+  <h1 class="gen-title" style="text-align:center">
+    Password Generator
+  </h1>
+  <div class="center">
+    <input type="number" placeholder="input the length of the generated password" class="password-input" style="display:block">
+  </div>
+  <div class="center">
+    <label>
+      <input type="checkbox" class="lower-check" checked="true">
+      Include lowercase letters(a-z)
+    </label>
+  </div>
+  <div class="center">
+    <label>
+      <input type="checkbox" class="upper-check">
+      Include uppercase letters(A-Z)
+    </label>
+  </div>
+  <div class="center">
+    <label>
+      <input type="checkbox" class="number-check">
+      Include numeric characters(0-9)
+    </label>
+  </div>
+  <div class="center">
+    <label>
+      <input type="checkbox" class="symbol-check">
+      Include symbols(*,<,>,!,&,etc)
+    </label>
+  </div>
+    <div class="center">
+      <button class="generate-btn">Generate Password</button>
+    </div>
+    
+    <div class="center">
+      <div class="generate-result"></div>
+    </div>
   <script src="main.js"></script>
 </body>
 </html>
