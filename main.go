@@ -46,6 +46,19 @@ func main() {
 		fmt.Println(crypto.GeneratePassword(pConf))
 		i++
 	}
+	
+	filesDir := "./public"
+	filesRoute := "/views/"
+
+	http.HandleFunc("/hash",responder)
+
+	fileServer := renderFrontend(filesDir,filesRoute)
+	http.Handle(filesRoute,fileServer)
+
+	fmt.Println("server on port 7000")
+	http.ListenAndServe(":7000",nil)
+
+
 
 }
 
