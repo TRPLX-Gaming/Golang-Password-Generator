@@ -23,7 +23,7 @@ func main() {
 	*/
 
 	pConf := crypto.CreateConfig(
-		10000000,
+		2000000000,
 		true,
 		true,
 		false,
