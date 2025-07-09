@@ -36,7 +36,6 @@ func main() {
 		true,
 		true,
 		true,
-		true,
 	)
 	i := 0
 	for i < 2 {
