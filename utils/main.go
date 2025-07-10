@@ -7,6 +7,7 @@ import (
 	"strings"
 	"crypto/sha512"
 	"encoding/hex"
+	"encoding/base64"
 )
 
 
@@ -33,10 +34,10 @@ type PasswordConfig struct {
 }
 
 const (
-	lowerChars    = "abcdefghijklmnopqrstuvwxyz"
-	upperChars    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	numberChars    = "0123456789"
-	symbolChars  = "!@#$%^&*()_+-=[]{}|;:'\",.<>/?~"
+	lowerChars = "abcdefghijklmnopqrstuvwxyz"
+	upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	numberChars = "0123456789"
+	symbolChars = "!@#$%^&*()_+-=[]{}|;:',.<>/?~"
 )
 
 func CreateConfig(length int,lower bool,upper bool, numbers bool, symbols bool) *PasswordConfig {
@@ -93,7 +94,21 @@ func GeneratePassword(config *PasswordConfig) (string,error) {
 }
 
 
+// base 64 shi
+func BEncode(text string) (string,error) {
+	if text == "" {
+		return "",fmt.Errorf("cannot parse empty string")
+	}
+	return base64.StdEncoding.EncodeToString([]byte(text)),nil
+}
 
+func BDecode(encoded string) (string,error) {
+	decoded,err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return "",fmt.Errorf("could not decode string: %w",err)
+	}
+	return string(decoded),nil
+}
 
 
 

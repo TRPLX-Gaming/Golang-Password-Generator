@@ -22,6 +22,22 @@ onmessage = async e => {
             type:task.type,
             data:result
         })
+    } else if(task.type === 'decode') {
+        const data = task.value
+        const result = await decodeString(data)
+        console.log(result)
+        postMessage({
+            type:task.type,
+            data:result
+        })
+    } else if(task.type === 'encode') {
+        const data = task.value
+        const result = await encodeString(data)
+        console.log(result)
+        postMessage({
+            type:task.type,
+            data:result
+        })
     } else {
         postMessage('unregistered task')
     }
@@ -57,6 +73,36 @@ async function generatePassword(length,lower,upper,numbers,symbols) {
                 numbers,
                 symbols
             })
+        })
+        return await response.text()
+    } catch(err) {
+        return err
+    }
+}
+
+async function encodeString(text) {
+    try {
+        const response = await fetch('/encode',{
+            method:'POST',
+            headers:{
+                'Content-Type':'text/plain'
+            },
+            body:text
+        })
+        return await response.text()
+    } catch(err) {
+        return err
+    }
+}
+
+async function decodeString(text) {
+    try {
+        const response = await fetch('/decode',{
+            method:'POST',
+            headers:{
+                'Content-Type':'text/plain'
+            },
+            body:text
         })
         return await response.text()
     } catch(err) {

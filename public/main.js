@@ -9,6 +9,10 @@ const addNumber = document.querySelector('.number-check')
 const addSymbol = document.querySelector('.symbol-check')
 const generateBtn = document.querySelector('.generate-btn')
 const generateResult = document.querySelector('.generate-result')
+const baseInput = document.querySelector('.base64-input')
+const encodeBtn = document.querySelector('.encode-btn')
+const decodeBtn = document.querySelector('.decode-btn')
+const baseResult = document.querySelector('.base64-result')
 
 // extra
 const worker = new Worker('worker.js')
@@ -40,6 +44,24 @@ generateBtn.addEventListener('click',()=>{
     startGenLoader()
 })
 
+encodeBtn.addEventListener('click',()=>{
+    if(baseInput.value === '') {
+        alert('empty ')
+        return
+    }
+    encode(baseInput.value)
+    startBaseLoader()
+})
+
+decodeBtn.addEventListener('click',()=>{
+    if(baseInput.value === '') {
+        alert('empty ')
+        return
+    }
+    decode(baseInput.value)
+    startBaseLoader()
+})
+
 const hash = str => {
     worker.postMessage({
         type:'hash',
@@ -60,6 +82,20 @@ const generate = length => {
     })
 }
 
+const encode = text => {
+    worker.postMessage({
+        type:'encode',
+        value:text
+    })
+}
+
+const decode = text => {
+    worker.postMessage({
+        type:'decode',
+        value:text
+    })
+}
+
 // worker comm
 worker.onmessage = e => {
     const result = e.data
@@ -67,6 +103,10 @@ worker.onmessage = e => {
         endHashLoader(result.data)
     } else if(result.type === 'generate') {
         endGenLoader(result.data)
+    } else if(result.type === 'encode') {
+        endBaseLoader(result.data)
+    } else if(result.type === 'decode') {
+        endBaseLoader(result.data)
     } else {
         console.log(result)
     }
@@ -108,7 +148,27 @@ function endGenLoader(result) {
     generateResult.style.width = `${100}%`
     generateResult.style.border = 'none'
     generateResult.style.borderRadius = '0'
-    generateResult.style.height = `${160}px`
+    generateResult.style.height = `${240}px`
     generateResult.style.animation = 'none'
     generateResult.textContent = `${result}`
+}
+
+function startBaseLoader() {
+    baseResult .style.width = `${80}px`
+    baseResult .style.height = `${80}px`
+    baseResult .style.opacity = '1'
+    baseResult .textContent = ''
+    baseResult .style.border = '4px solid cyan'
+    baseResult .style.borderRadius = '50%'
+    baseResult .style.borderTopColor = 'transparent'
+    baseResult .style.animation = 'spin 1.4s linear infinite'
+}
+
+function endBaseLoader(result) {
+    baseResult .style.width = `${100}%`
+    baseResult .style.border = 'none'
+    baseResult .style.borderRadius = '0'
+    baseResult .style.height = `${160}px`
+    baseResult .style.animation = 'none'
+    baseResult .textContent = `${result}`
 }

@@ -3,12 +3,38 @@ body {
   color:white;
 }
 
-.hash-title, .gen-title {
+.hash-title, .gen-title, .b64-title {
   color:white;
   font-family: monospace
 }
 
-.input, .password-input {
+.b64-title {
+  animation: new 2s linear infinite;
+}
+
+@keyframes new {
+  0% {
+    color:red;
+  }
+  
+  25% {
+    color:blue;
+  }
+  
+  50% {
+    color:white;
+  }
+  
+  75% {
+    color:limegreen;
+  }
+  
+  100% {
+    color:red;
+  }
+}
+
+.input, .password-input, .base64-input {
   width:80%;
   height:40px;
   font-size: 25px;
@@ -32,7 +58,7 @@ body {
   align-content: center;
 }
 
-.hash-btn, .generate-btn {
+.hash-btn, .generate-btn, .decode-btn, .encode-btn {
   font-size: 25px;
   border: 3px outset cyan;
   background: black;
@@ -65,7 +91,7 @@ label {
   height:25px;
 }
 
-.hash-result, .generate-result {
+.hash-result, .generate-result, .base64-result {
   opacity: 0;
   border: 4px solid cyan;
   border-top-color: transparent;
@@ -77,6 +103,10 @@ label {
   overflow-x: auto;
   white-space: wrap;
   animation: none;/*spin 1.4s linear infinite;*/
+}
+
+.base64-result {
+  margin-top: 30px;
 }
 
 @keyframes spin {

@@ -14,8 +14,8 @@ import (
 var embedded embed.FS
 
 func main() {
+	// /*
 
-	
 	filesDir := "./public"
 
 	// api for hashing
@@ -23,6 +23,12 @@ func main() {
 
 	// api for password generation
 	http.HandleFunc("/generate-password",passwordGenerator)
+
+	// api for base64 encoding
+	http.HandleFunc("/encode",encodeB64)
+
+	// api for base64 decoding
+	http.HandleFunc("/decode",decodeB64)
 
 	// rendering frontend in all undefined server routes
 	fileServer := http.FileServer(http.Dir(filesDir))
@@ -40,7 +46,9 @@ func main() {
 
 	fmt.Println("server on port 7000")
 	http.ListenAndServe(":7000",nil)
-	
+
+	// */
+
 }
 
 // hashing func
@@ -116,5 +124,63 @@ func passwordGenerator(w http.ResponseWriter,r *http.Request) {
 	}
 
 	fmt.Fprintf(w,generatedPassword)
+
+}
+
+// base 64 operations
+
+func encodeB64(w http.ResponseWriter, r *http.Request) {
+	// checking the http method
+	if r.Method != "POST" {
+		http.Error(w,"wrong method",http.StatusBadRequest)
+		return 
+	}
+
+	// getting the string to hash
+	body,err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w,err.Error(),http.StatusBadRequest)
+		return
+	}
+
+	// parsing info to string
+	str := string(body)
+	// encoding it
+	result,err := crypto.BEncode(str)
+	if err != nil {
+		http.Error(w,err.Error(),http.StatusBadRequest)
+		return
+	}
+
+	// send result back
+	fmt.Fprintf(w,result)
+
+}
+
+func decodeB64(w http.ResponseWriter, r *http.Request) {
+	// checking the http method
+	if r.Method != "POST" {
+		http.Error(w,"wrong method",http.StatusBadRequest)
+		return 
+	}
+
+	// getting the string to hash
+	body,err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w,err.Error(),http.StatusBadRequest)
+		return
+	}
+
+	// parsing info to string
+	str := string(body)
+	// decoding it
+	result,err := crypto.BDecode(str)
+	if err != nil {
+		http.Error(w,err.Error(),http.StatusBadRequest)
+		return
+	}
+
+	// send result back
+	fmt.Fprintf(w,result)
 
 }
